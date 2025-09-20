@@ -91,3 +91,7 @@ The notebook is designed as a **tutorial-style walkthrough** for structured Expl
 
 ---
 
+## Related Repositories
+- 📂 [Global EV Charging Dataset](https://github.com/tarekmasryo/global-ev-charging-dataset)
+- 📊 [EV Charging Dashboard](https://github.com/tarekmasryo/ev-charging-dashboard)
+
