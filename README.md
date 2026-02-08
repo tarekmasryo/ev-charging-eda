@@ -1,97 +1,71 @@
-# ⚡ Global EV Charging & Models 2025 — EDA Tutorial
+# ⚡ EV Charging EDA (Global 2025)
 
-## 📌 Project Overview  
-This project explores **global EV adoption** by analyzing charging station availability and electric vehicle (EV) models worldwide in 2025.  
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](#)
+[![Notebook](https://img.shields.io/badge/Format-Jupyter%20Notebook-orange)](#)
 
-By combining infrastructure data with EV model specifications, the analysis uncovers **regional gaps, adoption trends, and manufacturer dynamics**.  
-The notebook is designed as a **tutorial-style walkthrough** for structured Exploratory Data Analysis (EDA).  
-
----
-
-## 📊 Dataset  
-
-- **`charging_stations_2025_world.csv`** → EV charging stations (location, type, ports, power).  
-- **`country_summary_2025.csv`** → Country-level adoption and infrastructure metrics.  
-- **`ev_models_2025.csv`** → EV models and specifications (range, battery, manufacturer).  
-- **`world_summary_2025.csv`** → Aggregated global-level EV adoption statistics.  
-
-> 📌 Note: This repo focuses purely on **analysis & visualization**.   
+Decision-ready exploratory analysis for **global EV charging infrastructure** + **EV models** datasets.
 
 ---
 
-## 🔧 Methodology (Step-by-Step)  
+## 📌 What’s inside
 
-1) **Data Cleaning & Prep**  
-   - Inspect shapes, dtypes, missing values.  
-   - Standardize column naming for consistency.  
-   - Merge summaries for cross-country comparisons.  
-
-2) **Exploratory Analysis**  
-   - Global charging station distribution.  
-   - Country-level adoption vs. infrastructure ratio.  
-   - EV model trends: ranges, battery sizes, and availability.  
-
-3) **Visualization & Storytelling**  
-   - Comparative plots for regions and manufacturers.  
-   - Heatmaps, scatter plots, and bar charts for adoption insights.  
-   - Highlight infrastructure gaps vs. adoption demand.  
-
-4) **Insight Extraction**  
-   - Identify top EV markets by charging density.  
-   - Spot underserved regions.  
-   - Track how manufacturers contribute to model diversity.  
+- 📓 Notebooks:
+  - `ev-charging-stations-eda.ipynb` (stations + country summaries + light ML table)
+  - `global-ev-charging-stations-models-eda-tutorial.ipynb` (2025 refresh + models focus)
+- 🧱 Lightweight repo layout: `data/raw` + `artifacts`
+- 🧭 Path-safe loading (local `data/raw` + Kaggle fallback)
 
 ---
 
-## 🧠 Features Examined  
-- **Infrastructure:** station count, ports, charging power.  
-- **Adoption:** EV counts per country.  
-- **Models:** battery capacity, range, release year, manufacturer.  
-- **Ratios:** adoption-to-station, power per station, models per country.  
+## 📁 Repo layout
+
+```text
+.
+├── ev-charging-stations-eda.ipynb
+├── global-ev-charging-stations-models-eda-tutorial.ipynb
+├── data/
+│   └── raw/               # put CSVs here locally
+├── artifacts/             # saved outputs (optional)
+├── repo_utils/
+│   └── pathing.py         # local + Kaggle path helper
+├── CASE_STUDY.md
+├── requirements.txt
+└── .gitignore
+```
 
 ---
 
-## 📈 Results & Insights (Typical Findings)  
-- **Charging hubs**: Europe, China, and the US dominate, but with very different adoption/station ratios.  
-- **Emerging markets**: South America and Africa show adoption growth but lack charging density.  
-- **Manufacturers**: Tesla, BYD, and VW lead with model diversity; luxury brands offer high-range but niche models.  
-- **Infrastructure vs. Adoption**: Some countries have high EV penetration but lagging infrastructure — a critical gap for policy and investment.  
+## 🚀 Run locally
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Open either notebook in Jupyter / VS Code and run top-to-bottom.
 
 ---
 
-## 🗺️ Visual Gallery  
-- 🌐 **Global heatmap** of charging stations.  
-- 📊 **Country-level bar plots**: adoption vs. charging ratio.  
-- 🚗 **Top manufacturers** by model count.  
-- 📉 **Distribution plots**: range, battery capacity, ports per station.  
-- 🧭 **Comparative scatterplots**: EV adoption vs. infrastructure density.  
+## 📦 Data (local + Kaggle)
+
+**Local (recommended):**
+- Put the CSV files in `data/raw/`
+- The notebook loads them via:
+  - `resolve_data_path("<file>.csv", kaggle_subdir_hint="global-ev-charging-stations")`
+
+**Kaggle:**
+- Works with `/kaggle/input/global-ev-charging-stations/...`
 
 ---
 
-## 💡 Policy & Market Implications  
-- **Infrastructure investment** needed in adoption-heavy but station-light countries.  
-- **Policy incentives** can accelerate balanced EV ecosystem growth.  
-- **Market opportunities** for new entrants in underserved regions.  
-- **Manufacturers** should align EV rollouts with infrastructure availability to avoid adoption bottlenecks.  
+## 🧾 Case Study
+
+See: **CASE_STUDY.md** (project story + decisions, without repeating run steps).
 
 ---
 
-## ⚠️ Limitations  
-- External datasets — quality depends on original compilers.  
-- Limited scope: does not include real-time charging utilization or price signals.  
-- Analysis is descriptive, not predictive.  
+## 📜 License
 
----
-
-## 🔭 Future Work  
-- Add **time-series data** to capture adoption growth.  
-- Integrate **real-world usage metrics** (charging demand vs. capacity).  
-- Expand to **policy datasets** for richer cross-country comparisons.  
-- Build **forecasting models** for EV adoption and infrastructure needs.  
-
----
-
-## Related Repositories
-- 📂 [Global EV Charging Dataset](https://github.com/tarekmasryo/global-ev-charging-dataset)
-- 📊 [EV Charging Dashboard](https://github.com/tarekmasryo/ev-charging-dashboard)
-
+MIT (see `LICENSE`)
