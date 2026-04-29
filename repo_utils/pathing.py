@@ -2,26 +2,21 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable
 
 
-def _is_kaggle() -> bool:
-    return Path("/kaggle/input").exists() or os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
+def project_root(start: Path | None = None) -> Path:
+    """Best-effort repository root detection for notebooks and scripts."""
+    current = (start or Path.cwd()).resolve()
+    markers = {"README.md", "requirements.txt", ".git"}
 
-
-def project_root(start: Optional[Path] = None) -> Path:
-    """
-    Best-effort repo root detection (works in notebooks + scripts).
-    - Starts from `start` (or cwd) and walks up until it finds a marker.
-    """
-    p = (start or Path.cwd()).resolve()
-    markers = {"pyproject.toml", "requirements.txt", "README.md", ".git"}
     for _ in range(8):
-        if any((p / m).exists() for m in markers):
-            return p
-        if p.parent == p:
+        if any((current / marker).exists() for marker in markers):
+            return current
+        if current.parent == current:
             break
-        p = p.parent
+        current = current.parent
+
     return (start or Path.cwd()).resolve()
 
 
@@ -29,65 +24,60 @@ def resolve_data_path(
     filename: str,
     *,
     local_subdir: str = "data/raw",
-    kaggle_subdir_hint: Optional[str] = None,
-    extra_candidates: Optional[Iterable[str]] = None,
+    kaggle_subdir_hint: str | None = None,
+    extra_candidates: Iterable[str | Path] | None = None,
 ) -> Path:
+    """Resolve a dataset file from local folders, an env override, or Kaggle input.
+
+    Priority:
+    1. EV_CHARGING_DATA_DIR directory override
+    2. DATA_PATH full-file override
+    3. <repo>/<local_subdir>/<filename>
+    4. extra candidate directories or files
+    5. /kaggle/input/<kaggle_subdir_hint>/<filename>
+    6. light search under /kaggle/input
     """
-    Resolve a dataset file path with a simple priority:
-    1) Explicit env var `DATA_PATH` (full file path)
-    2) Local repo path: <root>/<local_subdir>/<filename>
-    3) Kaggle input path fallback: /kaggle/input/**/<filename>
-       - If kaggle_subdir_hint is provided, try /kaggle/input/<hint>/<filename> first.
-    4) Any extra candidate paths (strings)
-    """
-    env_path = os.environ.get("DATA_PATH")
-    if env_path:
-        p = Path(env_path).expanduser().resolve()
-        if p.exists():
-            return p
+    env_dir = os.environ.get("EV_CHARGING_DATA_DIR")
+    if env_dir:
+        env_candidate = Path(env_dir).expanduser() / filename
+        if env_candidate.exists():
+            return env_candidate.resolve()
+
+    env_file = os.environ.get("DATA_PATH")
+    if env_file:
+        env_path = Path(env_file).expanduser()
+        if env_path.exists() and env_path.name == filename:
+            return env_path.resolve()
 
     root = project_root()
-    local = (root / local_subdir / filename).resolve()
-    if local.exists():
-        return local
+    local_candidate = root / local_subdir / filename
+    if local_candidate.exists():
+        return local_candidate.resolve()
 
     if extra_candidates:
-        for c in extra_candidates:
-            p = Path(c).expanduser()
-            if not p.is_absolute():
-                p = (root / p).resolve()
-            else:
-                p = p.resolve()
-            if p.exists():
-                return p
+        for candidate in extra_candidates:
+            path = Path(candidate).expanduser()
+            if path.is_dir():
+                path = path / filename
+            elif not path.is_absolute():
+                path = root / path
 
-    if _is_kaggle():
-        base = Path("/kaggle/input")
-        if kaggle_subdir_hint:
-            hinted = base / kaggle_subdir_hint / filename
-            if hinted.exists():
-                return hinted
+            if path.exists():
+                return path.resolve()
 
-        # Light search (stop early). Avoid rglob() over huge trees in some environments.
-        matches = []
-        try:
-            for p in base.glob("*/*"):
-                if p.is_file() and p.name == filename:
-                    matches.append(p)
-                    break
-            if not matches:
-                for p in base.glob("*/*/*"):
-                    if p.is_file() and p.name == filename:
-                        matches.append(p)
-                        break
-        except Exception:
-            pass
+    kaggle_root = Path("/kaggle/input")
+    if kaggle_subdir_hint:
+        hinted = kaggle_root / kaggle_subdir_hint / filename
+        if hinted.exists():
+            return hinted.resolve()
 
-        if matches:
-            return matches[0].resolve()
+    if kaggle_root.exists():
+        for pattern in (f"*/{filename}", f"*/*/{filename}"):
+            matches = list(kaggle_root.glob(pattern))
+            if matches:
+                return matches[0].resolve()
 
     raise FileNotFoundError(
-        f"Could not find '{filename}'.\n"
-        f"Tried: DATA_PATH env var, {local_subdir}/, Kaggle /kaggle/input/.\n"
-        f"Tip: put the file under 'data/raw/' or set DATA_PATH."
+        f"Could not find '{filename}'. Put the CSV files under 'data/raw/', "
+        "attach the Kaggle dataset, or set EV_CHARGING_DATA_DIR."
     )

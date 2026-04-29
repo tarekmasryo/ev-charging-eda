@@ -1,71 +1,99 @@
-# ⚡ EV Charging EDA (Global 2025)
+# EV Charging Stations EDA
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](#)
-[![Notebook](https://img.shields.io/badge/Format-Jupyter%20Notebook-orange)](#)
+Decision-ready exploratory analysis for a global EV charging infrastructure dataset, with robust validation notes, country and city-level infrastructure views, EV model summaries, and a leakage-aware baseline for fast-DC signals.
 
-Decision-ready exploratory analysis for **global EV charging infrastructure** + **EV models** datasets.
+## What is included
 
----
+- `ev-charging-stations-eda.ipynb` — the main Kaggle-ready notebook.
+- `CASE_STUDY.md` — concise project story, decisions, limitations, and next steps.
+- `repo_utils/pathing.py` — optional local/Kaggle path helper for reproducible data loading.
+- `data/raw/.gitkeep` — placeholder for local CSV files.
+- `artifacts/.gitkeep` — placeholder for optional exported outputs.
 
-## 📌 What’s inside
-
-- 📓 Notebooks:
-  - `ev-charging-stations-eda.ipynb` (stations + country summaries + light ML table)
-  - `global-ev-charging-stations-models-eda-tutorial.ipynb` (2025 refresh + models focus)
-- 🧱 Lightweight repo layout: `data/raw` + `artifacts`
-- 🧭 Path-safe loading (local `data/raw` + Kaggle fallback)
-
----
-
-## 📁 Repo layout
+## Repository layout
 
 ```text
 .
 ├── ev-charging-stations-eda.ipynb
-├── global-ev-charging-stations-models-eda-tutorial.ipynb
-├── data/
-│   └── raw/               # put CSVs here locally
-├── artifacts/             # saved outputs (optional)
-├── repo_utils/
-│   └── pathing.py         # local + Kaggle path helper
 ├── CASE_STUDY.md
+├── LICENSE
+├── README.md
 ├── requirements.txt
-└── .gitignore
+├── data/
+│   └── raw/
+│       └── .gitkeep
+├── artifacts/
+│   └── .gitkeep
+└── repo_utils/
+    ├── __init__.py
+    └── pathing.py
 ```
 
----
+## Dataset files
 
-## 🚀 Run locally
+The notebook expects the following files, either from the Kaggle dataset input or from `data/raw/` when running locally:
+
+```text
+charging_station.csv
+country_summary.csv
+ev_models.csv
+world_summary.csv
+charging_station_ml.csv
+```
+
+Raw data files are intentionally not committed to this repository. Keep them under `data/raw/` locally, or attach the dataset to the Kaggle notebook.
+
+## Run locally
 
 ```bash
 python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
+# macOS/Linux
+source .venv/bin/activate
+
 pip install -r requirements.txt
+jupyter lab
 ```
 
-Open either notebook in Jupyter / VS Code and run top-to-bottom.
+Then open:
 
----
+```text
+ev-charging-stations-eda.ipynb
+```
 
-## 📦 Data (local + Kaggle)
+If the CSV files are stored outside `data/raw/`, set:
 
-**Local (recommended):**
-- Put the CSV files in `data/raw/`
-- The notebook loads them via:
-  - `resolve_data_path("<file>.csv", kaggle_subdir_hint="global-ev-charging-stations")`
+```bash
+EV_CHARGING_DATA_DIR=/path/to/dataset
+```
 
-**Kaggle:**
-- Works with `/kaggle/input/global-ev-charging-stations/...`
+## Kaggle usage
 
----
+Attach the dataset to the notebook on Kaggle. The notebook resolves files from:
 
-## 🧾 Case Study
+```text
+/kaggle/input/global-ev-charging-stations/
+```
 
-See: **CASE_STUDY.md** (project story + decisions).
+It also falls back to a light Kaggle input search if the attached dataset folder name differs.
 
----
+## What the notebook does
 
-## 📜 License
+- Reviews table shapes, schema, missing metadata, duplicate rows, and location placeholder buckets.
+- Preserves raw records while creating analysis-safe columns for robust aggregate metrics.
+- Builds country-level and city-level infrastructure summaries.
+- Uses minimum-count filters for fairer country rankings.
+- Separates known city labels from placeholder city labels in city rankings.
+- Compares fast-DC coverage, power distributions, country typologies, and EV model patterns.
+- Includes a leakage-aware city-level baseline that avoids power-derived features when modeling fast-DC presence.
 
-MIT (see `LICENSE`)
+## Notes on interpretation
+
+This is an exploratory and decision-support notebook. It is designed to make the dataset easier to inspect, explain, and reuse in dashboards or downstream modeling.
+
+The notebook keeps raw values available, while robust aggregate metrics avoid letting high-end reported power values dominate rankings, clustering, or summary statistics.
+
+## License
+
+MIT. See `LICENSE`.
